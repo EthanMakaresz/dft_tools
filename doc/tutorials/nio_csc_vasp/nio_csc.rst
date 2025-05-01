@@ -107,4 +107,4 @@ To help convergence, we keep the density (i.e., the GAMMA file) fixed for a few 
 
 We can start the whole machinery by executing::
 
-  vasp_dmft -n <n_procs> -i <n_iters> -j <n_iters_dft> -p <vasp_exec>  nio_csc.py
+  vasp_dmft -n <n_procs_vasp> -m <n_procs_dmft> -i <n_iters> -j <n_iters_dft> -p <vasp_exec>  nio_csc.py

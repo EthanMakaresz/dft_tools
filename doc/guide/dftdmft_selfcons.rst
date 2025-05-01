@@ -137,9 +137,9 @@ must finish by generating a Kohn-Sham (KS) density matrix (file `GAMMA` or `vasp
 and removing the lock file. The VASP process then reads in `GAMMA`/`vaspgamma.h5`
 and proceeds with the next iteration. PLOVasp interface provides a shell-script :program:`vasp_dmft` (in the triqs bin directory)::
 
-  vasp_dmft [-n <number of cores>] -i <number of iterations>  -j <number of VASP iterations with fixed charge density> [-v <VASP version>] [-p <path to VASP directory>] [<dmft_script.py>]
+  vasp_dmft [-n <number of VASP cores>] -m <number of DMFT cores> -i <number of iterations>  -j <number of VASP iterations with fixed charge density> [-v <VASP version>] [-p <path to VASP directory>] [<dmft_script.py>]
 
-       If the number of cores is not specified it is set to 1 by default.
+       If the number of cores for either VASP or DMFT is not specified it is set to 1 by default.
        Set the number of times the dmft solver is called with -i <number of iterations>
 
        Set the number of VASP iteration with a fixed charge density update
