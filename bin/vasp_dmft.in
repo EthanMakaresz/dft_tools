@@ -25,7 +25,7 @@ Usage: vasp_dmft [-n <number of VASP cores>] -m <number of DMFT cores> -i <numbe
 "
 }
 
-while getopts ":n:i:j:v:p:h" opt; do
+while getopts ":n:m:i:j:v:p:h" opt; do
   case $opt in
      n)
 #        echo "Option: NcpuVASP, argument: $OPTARG"
