@@ -5,9 +5,9 @@ MPIRUN_CMD=mpirun
 show_help()
 {
 echo "
-Usage: vasp_dmft [-n <number of cores>] -i <number of iterations>  -j <number of VASP iterations with fixed charge density> [-p <path to VASP directory>] [<dmft_script.py>]
+Usage: vasp_dmft [-n <number of VASP cores>] -m <number of DMFT cores> -i <number of iterations>  -j <number of VASP iterations with fixed charge density> [-p <path to VASP directory>] [<dmft_script.py>]
 
-       If the number of cores is not specified it is set to 1 by default.
+       If the number of cores for eithe VASP or DMFT is not specified it is set to 1 by default.
 
        Set the number of times the dmft solver is called with -i <number of iterations>
 
@@ -28,10 +28,17 @@ Usage: vasp_dmft [-n <number of cores>] -i <number of iterations>  -j <number of
 while getopts ":n:i:j:v:p:h" opt; do
   case $opt in
      n)
-#        echo "Option: Ncpu, argument: $OPTARG"
+#        echo "Option: NcpuVASP, argument: $OPTARG"
         if [ -n "$OPTARG" ]; then
-           NPROC=$OPTARG
-#           echo "Number of cores: $NPROC"
+           NPROCVASP=$OPTARG
+#           echo "Number of VASP cores: $NPROCVASP"
+        fi
+        ;;
+     m)
+#        echo "Option: NcpuDMFT, argument: $OPTARG"
+        if [ -n "$OPTARG" ]; then
+           NPROCDMFT=$OPTARG
+#        echo "Number of DMFT cores: $NPROCDMFT
         fi
         ;;
      i)
@@ -80,9 +87,14 @@ if [ -z "$VASP_DIR" ]; then
   exit 1
 fi
 
-if [ -z "$NPROC" ]; then
-  echo "  Number of cores not specified, setting to 1"
-  NPROC=1
+if [ -z "$NPROCVASP" ]; then
+  echo "  Number of VASP cores not specified, setting to 1"
+  NPROCVASP=1
+fi
+
+if [ -z "$NPROCDMFT" ]; then
+  echo "  Number of DMFT cores not specified, setting to 1"
+  NPROCDMFT=1
 fi
 
 if [ -z "$NDFTITER" ]; then
@@ -98,15 +110,16 @@ else
   DMFT_SCRIPT=$1
 fi
 
-echo "  Number of cores: $NPROC"
+echo "  Number of VASP cores: $NPROCVASP"
+echo "  Number of DMFT cores: $NPROCDMFT"
 echo "  Number of iterations: $NITER"
 echo "  Number of iterations with fixed density: $NDFTITER"
 echo "  Script name: $DMFT_SCRIPT"
 
 rm -f vasp.lock STOPCAR
 # run in serial and use OMP_NUM_THREADS here for vasp >=6.2 in case there are problems
-stdbuf -o 0 $MPIRUN_CMD -np $NPROC "$VASP_DIR" &
+stdbuf -o 0 $MPIRUN_CMD -np $NPROCVASP "$VASP_DIR" &
 
 
-$MPIRUN_CMD -np $NPROC @TRIQS_PYTHON_EXECUTABLE@ -m triqs_dft_tools.converters.plovasp.sc_dmft $(jobs -p) $NITER $NDFTITER $DMFT_SCRIPT 'plo.cfg' || kill %1
+$MPIRUN_CMD -np $NPROCDMFT @TRIQS_PYTHON_EXECUTABLE@ -m triqs_dft_tools.converters.plovasp.sc_dmft $(jobs -p) $NITER $NDFTITER $DMFT_SCRIPT 'plo.cfg' || kill %1
 
